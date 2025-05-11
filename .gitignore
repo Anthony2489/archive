@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.whl
+*.pth
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environments
+.venv
+venv
+env
+ENV
+*.env
+
+# Django specific
+*.log
+*.pot
+*.sqlite3
+*.db
+local_settings.py
+db.sqlite3-journal
+
+# General
+.DS_Store
+*.swp
+*.swo
+*.bak
+tmp/
+temp/
+
+# IDEs and editors
+.idea/
+*.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+ntuser.dat*
+Thumbs.db
