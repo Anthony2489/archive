@@ -50,6 +50,7 @@ LOCAL_APPS = [
     'custom',
     'student',
     'lecture',
+    'resources',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + DEFAULT_APPS + LOCAL_APPS
