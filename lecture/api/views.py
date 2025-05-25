@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status, generics, filters
+from rest_framework import status, generics, filters, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -18,6 +18,7 @@ from rest_framework import (
     decorators as rest_decorators,
     permissions as rest_permissions,
 )
+from custom.models import User  # Added missing import
 from resources.models import Assignments, AssignmentSubmissions, resources
 from .serializers import UserSerializer, LectureSerializer, UpdateSerializer, AssignmentSerializer, AssignmentSubmissionSerializer, ResourceSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -84,7 +85,7 @@ class WhoAmIView(APIView):
         print(request.user.username)
         user = request.user
         data = {
-            'full_name': user.first_name,
+            'full_name': user.full_name,  # Changed from user.first_name to user.full_name
             'username': user.username,
             'email': user.email,
             # 'department': user.department
