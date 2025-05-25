@@ -18,9 +18,16 @@ from rest_framework import (
     decorators as rest_decorators,
     permissions as rest_permissions,
 )
-from custom.models import User  # Added missing import
-from resources.models import Assignments, AssignmentSubmissions, resources
-from .serializers import UserSerializer, LectureSerializer, UpdateSerializer, AssignmentSerializer, AssignmentSubmissionSerializer, ResourceSerializer
+from custom.models import User
+from resources.models import Assignments, AssignmentSubmissions
+from .serializers import (
+    UserSerializer, 
+    LectureSerializer, 
+    UpdateSerializer, 
+    AssignmentSerializer, 
+    AssignmentSubmissionSerializer,
+    FeedbackSerializer
+)
 from rest_framework.parsers import MultiPartParser, FormParser
 import os
 
@@ -211,56 +218,17 @@ class AssignmentSubmissionListView(generics.ListAPIView):
 
 
 class AssignmentSubmissionFeedbackView(generics.UpdateAPIView):
-    serializer_class = AssignmentSubmissionSerializer
+    serializer_class = FeedbackSerializer
     queryset = AssignmentSubmissions.objects.all()
     permission_classes = [IsLecturer]
     http_method_names = ['patch']
-
-
-# Resource CRUD
-class ResourceListCreateView(generics.ListCreateAPIView):
-    serializer_class = ResourceSerializer
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    ordering_fields = ['uploaded_at', 'resource_type']
-    search_fields = ['resource_type', 'course_id__course_name', 'assignment__title']
-    parser_classes = [MultiPartParser, FormParser]
-
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [IsLecturer()]
-        return [permissions.IsAuthenticated()]
-
-    def get_queryset(self):
-        return resources.objects.filter(uploaded_by=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(uploaded_by=self.request.user)
-
-
-class ResourceRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ResourceSerializer
-    queryset = resources.objects.all()
-    parser_classes = [MultiPartParser, FormParser]
-
-    def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [IsLecturer()]
-        return [permissions.IsAuthenticated()]
-
-
-class ResourceDownloadView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, pk):
-        try:
-            resource = resources.objects.get(pk=pk)
-            if not resource.resource_file:
-                raise Http404
-            file_path = resource.resource_file.path
-            file_handle = open(file_path, 'rb')
-            response = FileResponse(file_handle, as_attachment=True, filename=os.path.basename(file_path))
-            return response
-        except resources.DoesNotExist:
-            raise Http404
-        except Exception:
-            raise Http404
+    
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+    
+    def perform_update(self, serializer):
+        # Automatically mark as graded when feedback is provided
+        instance = serializer.save()
+        if instance.feedback or instance.score is not None:
+            instance.is_graded = True
+            instance.save()

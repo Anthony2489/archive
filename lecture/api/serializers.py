@@ -96,7 +96,20 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentSubmissions
         fields = '__all__'
-        read_only_fields = ('id', 'submission_date', 'score', 'feedback', 'is_graded', 'attempt_number', 'file_checksum')
+        read_only_fields = ('id', 'submission_date', 'student', 'assignment', 'attempt_number', 'file_checksum')
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    """Specific serializer for updating feedback on assignment submissions"""
+    class Meta:
+        model = AssignmentSubmissions
+        fields = ['feedback', 'score', 'is_graded']
+        
+    def validate_score(self, value):
+        """Ensure score is within valid range if provided"""
+        if value is not None and (value < 0 or value > 100):
+            raise serializers.ValidationError("Score must be between 0 and 100")
+        return value
 
 
 class ResourceSerializer(serializers.ModelSerializer):
