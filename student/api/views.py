@@ -1,12 +1,12 @@
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.http import require_POST
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from rest_framework import status, generics, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import (
@@ -18,7 +18,10 @@ from rest_framework import (
 
 from custom.api.serializers import UserSerializer
 from custom.models import User
-from .serializers import StudentSerializer, UpdateSerializer
+from .serializers import StudentSerializer, UpdateSerializer, AssignmentSubmissionSerializer, ResourceSerializer
+from resources.models import AssignmentSubmissions, resources
+import os
+from django.conf import settings
 
 
 @rest_decorators.api_view(["GET"])
@@ -169,3 +172,57 @@ def delete_account(request):
     user = request.user
     user.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class StudentAssignmentSubmissionListCreateView(generics.ListCreateAPIView):
+    serializer_class = AssignmentSubmissionSerializer
+    permission_classes = [rest_permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['submission_date']
+    search_fields = ['assignment__title']
+
+    def get_queryset(self):
+        return AssignmentSubmissions.objects.filter(student__user=self.request.user)
+
+    def perform_create(self, serializer):
+        student = self.request.user.student
+        serializer.save(student=student)
+
+
+class StudentAssignmentSubmissionDetailView(generics.RetrieveAPIView):
+    serializer_class = AssignmentSubmissionSerializer
+    permission_classes = [rest_permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AssignmentSubmissions.objects.filter(student__user=self.request.user)
+
+
+class StudentResourceListView(generics.ListAPIView):
+    serializer_class = ResourceSerializer
+    permission_classes = [rest_permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['uploaded_at']
+    search_fields = ['resource_type', 'course_id__course_name', 'assignment__title']
+
+    def get_queryset(self):
+        # Optionally filter by group, course, etc. for the student
+        return resources.objects.filter(is_active=True)
+
+
+class ResourceDownloadView(generics.GenericAPIView):
+    serializer_class = ResourceSerializer
+    permission_classes = [rest_permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            resource = resources.objects.get(pk=pk, is_active=True)
+            if not resource.resource_file:
+                raise Http404
+            file_path = resource.resource_file.path
+            file_handle = open(file_path, 'rb')
+            response = FileResponse(file_handle, as_attachment=True, filename=os.path.basename(file_path))
+            return response
+        except resources.DoesNotExist:
+            raise Http404
+        except Exception:
+            raise Http404
