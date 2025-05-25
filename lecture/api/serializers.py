@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from lecture.models import Lecture
 from custom.models import User
+from resources.models import Assignments, AssignmentSubmissions, resources
 
 
 class LectureSerializer(serializers.ModelSerializer):
@@ -67,3 +68,24 @@ class UpdateSerializer(serializers.ModelSerializer):
             "email",
             # "department",
         )
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignments
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at', 'created_by', 'updated_by')
+
+
+class AssignmentSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssignmentSubmissions
+        fields = '__all__'
+        read_only_fields = ('id', 'submission_date', 'score', 'feedback', 'is_graded', 'attempt_number', 'file_checksum')
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = resources
+        fields = '__all__'
+        read_only_fields = ('id', 'uploaded_at', 'uploaded_by')

@@ -9,7 +9,14 @@ from .views import (
     logoutView,
     update_account,
     delete_account,
-    LectureView
+    LectureView,
+    AssignmentListCreateView,
+    AssignmentRetrieveUpdateDestroyView,
+    AssignmentSubmissionListView,
+    AssignmentSubmissionFeedbackView,
+    ResourceListCreateView,
+    ResourceRetrieveUpdateDestroyView,
+    ResourceDownloadView,
 )
 
 urlpatterns = [
@@ -23,4 +30,11 @@ urlpatterns = [
     path("logout", logoutView),
     path("update", update_account),
     path("delete", delete_account),
+    path('assignments/', AssignmentListCreateView.as_view(), name='lecturer-assignment-list-create'),
+    path('assignments/<int:pk>/', AssignmentRetrieveUpdateDestroyView.as_view(), name='lecturer-assignment-detail'),
+    path('submissions/', AssignmentSubmissionListView.as_view(), name='lecturer-submission-list'),
+    path('submissions/<int:pk>/feedback/', AssignmentSubmissionFeedbackView.as_view(), name='lecturer-submission-feedback'),
+    path('resources/', ResourceListCreateView.as_view(), name='lecturer-resource-list-create'),
+    path('resources/<int:pk>/', ResourceRetrieveUpdateDestroyView.as_view(), name='lecturer-resource-detail'),
+    path('resources/download/<int:pk>/', ResourceDownloadView.as_view(), name='lecturer-resource-download'),
 ]
