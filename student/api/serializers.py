@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from student.models import Student
 from custom.models import User
+from resources.models import AssignmentSubmissions, resources
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -62,3 +63,21 @@ class UpdateSerializer(serializers.ModelSerializer):
             "full_name",
             "email",
         )
+
+
+class AssignmentSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssignmentSubmissions
+        fields = '__all__'
+        read_only_fields = ('id', 'submission_date', 'score', 'feedback', 'is_graded', 'attempt_number', 'file_checksum')
+
+    def validate(self, data):
+        # Optional: Add file validation logic here if file field is present
+        return data
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = resources
+        fields = '__all__'
+        read_only_fields = ('id', 'uploaded_at', 'uploaded_by')
