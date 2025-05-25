@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import FileResponse, Http404
 import os
-from resources.serializers import ResourceSerializer
+from .serializers import ResourceSerializer
 from rest_framework import status
 from django.urls import reverse
 
