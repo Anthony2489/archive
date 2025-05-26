@@ -15,3 +15,6 @@ referencing==0.36.2
 rpds-py==0.24.0
 sqlparse==0.5.3
 uritemplate==4.1.1
+Pillow>=10.0.0
+python-dotenv>=1.0.1
+pytest-django>=4.5.2
