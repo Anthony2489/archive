@@ -62,3 +62,5 @@ temp/
 # OS generated files
 ntuser.dat*
 Thumbs.db
+
+*./build.sh
