@@ -63,4 +63,4 @@ temp/
 ntuser.dat*
 Thumbs.db
 
-0001_initial.py
+**/migrations/
