@@ -63,6 +63,7 @@ temp/
 ntuser.dat*
 Thumbs.db
 
+**/migrations/
 *./build.sh
 *._initial.py
 */migrations/*.py

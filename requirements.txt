@@ -24,5 +24,8 @@ rpds-py==0.24.0
 sqlparse==0.5.3
 typing_extensions==4.13.2
 uritemplate==4.1.1
+Pillow>=10.0.0
+python-dotenv>=1.0.1
+pytest-django>=4.5.2
 uvicorn==0.34.2
 whitenoise==6.9.0
